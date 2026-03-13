@@ -1,11 +1,193 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        Hello World
-    </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie 批量操作助手</title>
+    <style>
+        /* 基础重置与全局字体 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            background-color: #f3f4f6; /* 柔和的浅灰背景 */
+            color: #1f2937; 
+            padding: 40px 20px; 
+            display: flex; 
+            justify-content: center; 
+        }
+        
+        /* 主面板容器 */
+        .app-container { 
+            background: #ffffff; 
+            width: 100%; 
+            max-width: 800px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* 现代感的柔和阴影 */
+            padding: 30px; 
+        }
+
+        /* 顶部标题栏 */
+        .header { border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 25px; }
+        .header h1 { font-size: 24px; font-weight: 600; color: #111827; display: flex; align-items: center; gap: 10px; }
+        
+        /* 区块标题 */
+        .section-title { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em; }
+        .section { margin-bottom: 30px; }
+
+        /* 输入框与按钮组合 */
+        .input-group { display: flex; gap: 12px; }
+        input[type="text"] { 
+            flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; 
+            border-radius: 8px; font-size: 14px; background-color: #f9fafb; 
+            outline: none; transition: border-color 0.2s, background-color 0.2s; 
+        }
+        input[type="text"]:focus { border-color: #3b82f6; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        /* 按钮通用样式 */
+        .btn { 
+            padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; 
+            font-weight: 500; cursor: pointer; transition: all 0.2s ease; 
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: white; 
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn:active { transform: translateY(0); box-shadow: none; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        /* 按钮颜色主题 */
+        .btn-secondary { background-color: #4b5563; }
+        .btn-secondary:hover { background-color: #374151; }
+        .btn-primary { background-color: #3b82f6; } /* 蓝色 */
+        .btn-primary:hover { background-color: #2563eb; }
+        .btn-success { background-color: #10b981; } /* 绿色 */
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: #ef4444; }  /* 红色 */
+        .btn-danger:hover { background-color: #dc2626; }
+
+        /* 动作按钮网格 */
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+
+        /* 极客风格终端日志 */
+        .terminal { 
+            background-color: #1e1e1e; border-radius: 8px; padding: 15px; 
+            height: 280px; overflow-y: auto; 
+            font-family: "Fira Code", Consolas, Monaco, monospace; /* 等宽代码字体 */
+            font-size: 13px; color: #a7f3d0; line-height: 1.6; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); 
+            white-space: pre-wrap;
+        }
+        /* 自定义滚动条 */
+        .terminal::-webkit-scrollbar { width: 8px; }
+        .terminal::-webkit-scrollbar-track { background: #1e1e1e; border-radius: 8px; }
+        .terminal::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .terminal::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        
+        /* 日志颜色区分 */
+        .log-time { color: #6b7280; }
+        .log-info { color: #93c5fd; }
+        .log-success { color: #34d399; }
+        .log-warn { color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>🍪 Cookie 批量管理中心</h1>
+    </div>
+
+    <div class="section">
+        <div class="section-title">1. 数据源设置</div>
+        <div class="input-group">
+            <input type="text" id="folderPath" readonly placeholder="请选择包含 Cookie 文本的文件夹路径...">
+            <button class="btn btn-secondary" id="btnSelect" onclick="mockSelectFolder()">
+                📂 浏览文件夹
+            </button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">2. 批量执行任务</div>
+        <div class="action-grid">
+            <button class="btn btn-primary" onclick="mockRunTask('功能1: 批量子账户改名')">
+                ✏️ 批量改名
+            </button>
+            <button class="btn btn-success" onclick="mockRunTask('功能2: 批量新建项目')">
+                ✨ 新建项目
+            </button>
+            <button class="btn btn-danger" onclick="mockRunTask('功能3: 清理销毁为0的单元')">
+                🗑️ 清理废弃单元
+            </button>
+        </div>
+    </div>
+
+    <div class="section" style="margin-bottom: 0;">
+        <div class="section-title">3. 运行日志监控</div>
+        <div class="terminal" id="logArea"></div>
+    </div>
+</div>
+
+<script>
+    const logArea = document.getElementById('logArea');
+    const folderInput = document.getElementById('folderPath');
+
+    // 格式化输出日志
+    function printLog(msg, type = 'info') {
+        const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+        let colorClass = 'log-info';
+        if (type === 'success') colorClass = 'log-success';
+        if (type === 'warn') colorClass = 'log-warn';
+
+        const logLine = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>\n`;
+        logArea.innerHTML += logLine;
+        logArea.scrollTop = logArea.scrollHeight; // 自动滚到底部
+    }
+
+    // 初始化问候
+    window.onload = () => {
+        printLog("系统初始化完成。等待选择文件夹...", "info");
+    };
+
+    // ==========================================
+    // 下面是纯前端的交互模拟（让你在浏览器里预览效果）
+    // 后续对接桌面端框架时，会替换为真实的本地文件读取接口
+    // ==========================================
+
+    function mockSelectFolder() {
+        // 模拟弹窗选择文件夹
+        folderInput.value = "C:\\Users\\Admin\\Desktop\\MyCookies";
+        printLog("已加载目标文件夹: " + folderInput.value, "success");
+        printLog("扫描到 5 个 Cookie 文件准备就绪。", "info");
+    }
+
+    function mockRunTask(taskName) {
+        if (!folderInput.value) {
+            printLog("警告: 请先选择 Cookie 文件夹！", "warn");
+            return;
+        }
+
+        printLog(`\n>>> 正在启动 [${taskName}] ...`, "info");
+        
+        // 模拟任务进度
+        let count = 1;
+        const total = 5;
+        const interval = setInterval(() => {
+            printLog(`正在处理文件 (${count}/${total}): account_${count}.txt`, "info");
+            
+            // 模拟接口请求延迟后返回成功
+            setTimeout(() => {
+                printLog(`  └─ 处理完成: account_${count}.txt 接口调用成功`, "success");
+            }, 300);
+
+            count++;
+            if (count > total) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    printLog(`<<< [${taskName}] 批量任务全部执行完毕！\n`, "success");
+                }, 600);
+            }
+        }, 800);
+    }
+</script>
+
+</body>
 </html>
